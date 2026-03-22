@@ -2,19 +2,19 @@
 #include <math.h>
 #include <iostream>
 
-bool getLowestRoot(double a, double b, double c, double maxR,double* root) {
+bool getLowestRoot(float a, float b, float c, float maxR,float* root) {
     // Check if a solution exists
-    double determinant = b*b - 4.0*a*c;
+    float determinant = b*b - 4.0*a*c;
     // If determinant is negative it means no solutions.
     if (determinant < 0.0) return false;
     // calculate the two roots: (if determinant == 0 then
     // x1==x2 but let's disregard that slight optimization)
-    double sqrtD = sqrt(determinant);
-    double r1 = (-b - sqrtD) / (2*a);
-    double r2 = (-b + sqrtD) / (2*a);
+    float sqrtD = sqrt(determinant);
+    float r1 = (-b - sqrtD) / (2*a);
+    float r2 = (-b + sqrtD) / (2*a);
     // Sort so x1 <= x2
     if (r1 > r2) {
-        double temp = r2;
+        float temp = r2;
         r2 = r1;
         r1 = temp;
     }
@@ -43,12 +43,12 @@ bool edge::isFrontFacingTo(const vec2& v) const {
     return n.dot(v) > 0.0;
 }
 
-double signedDistanceTo(vec2 &p, edge e) {
+float signedDistanceTo(vec2 &p, edge e) {
     return (e.n.dot(p) - e.d);
 }
 
 bool checkPointInEdge(vec2 p, edge e) {
-    const double EPS = 1e-5;
+    const float EPS = 1e-5;
 
     vec2 ab = e.v2 - e.v1;
 
@@ -59,13 +59,13 @@ bool checkPointInEdge(vec2 p, edge e) {
     return true;
 }
 
-void checkEdge(CollisionPacket* colPackage, const edge& e) {
+void checkEdge(CollisionPacket* colPackage, const edge& e, edge* edgePtr) {
     if (e.isFrontFacingTo(colPackage->velocity)) {
-        double t0, t1;
+        float t0, t1;
         bool embeddedInEdge = false;
 
-        double signedDistToEdge = signedDistanceTo(colPackage->basePoint, e);
-        double normalDotVelocity = e.n.dot(colPackage->velocity);
+        float signedDistToEdge = signedDistanceTo(colPackage->basePoint, e);
+        float normalDotVelocity = e.n.dot(colPackage->velocity);
 
         if (fabs(normalDotVelocity) < 1e-7) {
             if (fabs(signedDistToEdge) >= 1.0) {
@@ -80,7 +80,7 @@ void checkEdge(CollisionPacket* colPackage, const edge& e) {
             t1=( 1.0-signedDistToEdge)/normalDotVelocity;
 
             if (t0 > t1) {
-                double temp = t1;
+                float temp = t1;
                 t1 = t0;
                 t0 = temp;
             }
@@ -98,7 +98,7 @@ void checkEdge(CollisionPacket* colPackage, const edge& e) {
         vec2 collisionPoint;
         vec2 collisionNormal;
         bool foundCollision = false;
-        double t = 1.0;
+        float t = 1.0;
 
         if (!embeddedInEdge) {
             vec2 edgeIntersectionPoint = (colPackage->basePoint - e.n) + colPackage->velocity * t0;
@@ -114,8 +114,8 @@ void checkEdge(CollisionPacket* colPackage, const edge& e) {
         if (foundCollision == false) {
             vec2 base = colPackage->basePoint;
             vec2 velocity = colPackage ->velocity;
-            double a,b,c;
-            double newT;
+            float a,b,c;
+            float newT;
 
             a = velocity.squaredLength();
             b = 2.0*(velocity.dot(base-e.v1));
@@ -147,7 +147,93 @@ void checkEdge(CollisionPacket* colPackage, const edge& e) {
                 colPackage->intersectionPoint = collisionPoint;
                 colPackage->foundCollision = true;
                 colPackage->collisionNormal = collisionNormal;
+                colPackage->nearestEdge = edgePtr;
             }
         }
     }
+}
+
+vec2::vec2(float x_, float y_) : x(x_), y(y_) {}
+
+vec2::vec2() : x(0.0), y(0.0) {}
+
+float vec2::squaredLength() const {
+    return x * x + y * y;
+}
+
+void vec2::setLength(const float l) {
+    if (x == 0.0 && y == 0.0) { x = 0.0; y = 0.0; return; }
+    float len = sqrt(x * x + y * y);
+    x = l * x/len;
+    y = l * y/len;
+    return;
+}
+
+float vec2::len() const {
+    return sqrt(x * x + y * y);
+}
+
+void vec2::normalise() {
+    if (x == 0.0 && y == 0.0) {
+        x = 0.0; 
+        y = 0.0;
+        return;
+    }
+    float len = sqrt(x * x + y * y);
+    x = x/len; 
+    y = y/len;
+}
+
+float vec2::dot(const vec2& other) const {
+    return x * other.x + y * other.y;
+}
+
+vec2 vec2::normal() {
+    return vec2(y, -x);
+}
+
+vec2 vec2::operator - (const vec2& other) const {
+    return vec2(x - other.x, y - other.y);
+}
+
+vec2 vec2::operator - () const {
+    return vec2(-x, -y);
+}
+
+vec2 vec2::operator + (const vec2& other) const {
+    return vec2(x + other.x, y + other.y);
+}
+
+vec2 vec2::operator * (const vec2& other) const {
+    return vec2(x * other.x, y * other.y);
+}
+
+vec2 vec2::operator / (const vec2& other) const {
+    return vec2(x / other.x, y / other.y);
+}
+
+vec2 vec2::operator * (const float scalar) const {
+    return vec2(x * scalar, y * scalar);
+}
+
+vec2 vec2::operator / (const float scalar) const {
+    return vec2(x / scalar, y / scalar);
+}
+
+vec2& vec2::operator -= (const vec2& other) {
+    x -= other.x;
+    y -= other.y;
+    return *this;
+}
+
+vec2& vec2::operator += (const vec2& other) {
+    x += other.x;
+    y += other.y;
+    return *this;
+}
+
+vec2& vec2::operator *= (const vec2& other) {
+    x *= other.x;
+    y *= other.y;
+    return *this;
 }

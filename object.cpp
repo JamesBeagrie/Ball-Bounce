@@ -1,17 +1,20 @@
 #include <vector>
 #include "raylib.h"
-#include "object.h"
 #include "mathlib.h"
+#include "windowlib.h"
+#include "object.h"
 
-void Object::draw(const vec2& centre) {
+void Object::draw(Context* global_context) {
     for(auto& edge : e) {
-        DrawLineV({(float)edge.v1.x - (float)centre.x, (float)edge.v1.y - (float)centre.y}, {(float)edge.v2.x - (float)centre.x, (float)edge.v2.y - (float)centre.y}, SKYBLUE);
+        vec2 v1_ = formatWindowVec2(global_context, edge.v1 + centre);
+        vec2 v2_ = formatWindowVec2(global_context, edge.v2 + centre);
+        DrawLine(static_cast<int>(v1_.x), static_cast<int>(v1_.y), static_cast<int>(v2_.x), static_cast<int>(v2_.y), SKYBLUE);
     }
 }
 
 void Object::checkCollision(CollisionPacket* collisionPackage) {
     for(auto& e_ : e) {
         edge eSpaceEdge = edge(e_.v1 / collisionPackage->eRadius,e_.v2 /collisionPackage->eRadius);
-        checkEdge(collisionPackage, eSpaceEdge);
+        checkEdge(collisionPackage, eSpaceEdge, &e_);
     }
 }

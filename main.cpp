@@ -4,68 +4,44 @@
 #include <math.h>
 #include <iostream>
 #include "mathlib.h"
-
-void screenText() {
-    DrawFPS(5,5);
-}
-
-void createPolygon(int sides, vec2 c, double radius, Object *obj) {
-    for(int i = 0; i < sides; i++) {
-        vec2 p1 = {static_cast<double>(c.x + radius * sin(2.0f * M_PI * i / sides)), 
-                    static_cast<double>(c.y + radius * cos(2.0f * M_PI * i / sides))};
-        vec2 p2 = {static_cast<double>(c.x + radius * sin(2.0f * M_PI * (i+1.0f) / sides)), 
-                    static_cast<double>(c.y + radius * cos(2.0f * M_PI * (i+1.0f) / sides))};
-        obj->e.push_back({p1,p2});
-    }
-}
-
-void createWaveBowl(vec2 c,
-                    double width,
-                    double height,
-                    int segments,
-                    Object* obj)
-{
-    double startX = c.x - width * 0.5;
-    double dx = width / segments;
-
-    for (int i = 0; i < segments; i++)
-    {
-        double x1 = startX + i * dx;
-        double x2 = startX + (i + 1) * dx;
-
-        double y1 = c.y + sin((double)i / segments * 4.0 * M_PI) * height;
-        double y2 = c.y + sin((double)(i+1) / segments * 4.0 * M_PI) * height;
-
-        vec2 p1 = {x1, y1};
-        vec2 p2 = {x2, y2};
-
-        obj->e.push_back({p1, p2});
-    }
-}
+#include "context.h"
+#include "objectlib.h"
+#include "windowlib.h"
 
 int main(void)
 {
-    const vec2 center = vec2(400.0, 300.0);
-
     Object obj;
-    // Pos, Vel, Radius
-    Ball ball({440,400}, {0.0,0.0}, {10.0,10.0});
+    obj.centre = {0.0f,0.0f};
+    Context global_context;
+    global_context.cameraFollowType = FollowType::ball_delayed;
+    global_context.cameraPos = {0.0f,0.0f};
+
+    Ball ball({0.0f,0.0f}, {0.0f,0.0f}, {10.0f,10.0f}); // Pos, Vel, Radius
     bool update = true;
 
-
-    InitWindow(800, 600, "raylib works");
+    InitWindow(800, 600, "Ball Bounce");
     SetTargetFPS(60);
 
-    createPolygon(70,{400,300}, 200, &obj);
+    createWaveBowl({0.0f,0.0f}, 1000.0f, 200.0f, 200, &obj);
 
     while (!WindowShouldClose())
     {
         // Calculate update
-
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            vec2 mousePos = {static_cast<double>(GetMouseX()),static_cast<double>(GetMouseY())};
+            vec2 mousePos = reverseFormatWindowVec2(&global_context, static_cast<float>(GetMouseX()), static_cast<float>(GetMouseY()));
             ball.p = mousePos;
-            ball.v = {0.0,0.0};
+            ball.v = {0.0f,0.0f};
+        }               
+
+        switch(global_context.cameraFollowType) {
+            case FollowType::ball:
+                global_context.cameraPos = ball.p;
+                break;
+            case FollowType::ball_delayed:
+                global_context.cameraPos = global_context.cameraPos + (ball.p - global_context.cameraPos)/10.0f;
+                break;
+            default:
+            global_context.cameraPos = {0.0f,0.0f};
         }
 
         if (IsKeyPressed(32)) {
@@ -82,8 +58,8 @@ int main(void)
 
         // Start image generation
 
-        obj.draw(ball.p - center);
-        ball.draw(ball.p - center);
+        obj.draw(&global_context);
+        ball.draw(&global_context);
         screenText();
 
         EndDrawing();
