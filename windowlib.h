@@ -6,7 +6,7 @@
 
 void screenText();
 
-vec2 formatWindowVec2(Context* global_context, const vec2& v);
-vec2 reverseFormatWindowVec2(Context* global_context, float x, float y);
+vec2 formatWindowVec2(Context* context, const vec2& v);
+vec2 reverseFormatWindowVec2(Context* context, float x, float y);
 
 #endif

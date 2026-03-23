@@ -1,5 +1,5 @@
-#ifndef CIRCLE_H
-#define CIRCLE_H
+#ifndef CIRCLEHELL_H
+#define CIRCLEHELL_H
 
 #include "raylib.h"
 #include "object.h"

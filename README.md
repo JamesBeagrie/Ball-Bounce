@@ -37,3 +37,9 @@ I will try to use this throughout but I cannot promise anything!
 Apart from variables which I will use CamelCase.
 
 https://lefticus.gitbooks.io/cpp-best-practices/content/03-Style.html
+
+---
+
+Credit:
+
+- Raylib used for basic stuff. (Window, sound, etc.)

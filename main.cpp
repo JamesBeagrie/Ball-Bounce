@@ -8,61 +8,72 @@
 #include "objectlib.h"
 #include "windowlib.h"
 
+bool setup(Context* context) {
+    Object obj;
+    obj.centre = {100.0f , 100.0f};
+    createWaveBowl({0.0f,0.0f}, 1000.0f, 200.0f, 200, &obj);
+
+    Ball ball({0.0f,0.0f}, {0.0f,0.0f}, {10.0f,10.0f});
+
+    context->gameContext.environment.push_back(obj);
+    context->gameContext.ball = ball;
+
+    context->cameraFollowType = FollowType::ball_delayed;
+    context->cameraPos = {0.0f,0.0f};
+    return true;
+}
+
+void update(Context* context) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        vec2 mousePos = reverseFormatWindowVec2(context, static_cast<float>(GetMouseX()), static_cast<float>(GetMouseY()));
+        context->gameContext.ball.p = mousePos;
+        context->gameContext.ball.v = {0.0f,0.0f};
+    }               
+
+    switch(context->cameraFollowType) {
+        case FollowType::ball:
+            context->cameraPos = context->gameContext.ball.p;
+            break;
+        case FollowType::ball_delayed:
+            context->cameraPos = context->cameraPos + (context->gameContext.ball.p - context->cameraPos)/10.0f;
+            break;
+        default:
+        context->cameraPos = {0.0f,0.0f};
+    }
+    
+    for (auto& obj : context->gameContext.environment) {
+        obj.update();
+    }
+    context->gameContext.ball.update(context->gameContext.environment);
+}
+
+void draw(Context* context) {
+    BeginDrawing();
+    ClearBackground(BLACK);
+    for (auto& obj : context->gameContext.environment) {
+        obj.draw(context);
+    }
+    context->gameContext.ball.draw(context);
+    screenText();
+    EndDrawing();
+}
+
 int main(void)
 {
-    Object obj;
-    obj.centre = {0.0f,0.0f};
-    Context global_context;
-    global_context.cameraFollowType = FollowType::ball_delayed;
-    global_context.cameraPos = {0.0f,0.0f};
+    
+    Context context;
 
-    Ball ball({0.0f,0.0f}, {0.0f,0.0f}, {10.0f,10.0f}); // Pos, Vel, Radius
-    bool update = true;
+    if (setup(&context)) {
+        std::cout << "Setup complete!" << std::endl;
+    }
 
     InitWindow(800, 600, "Ball Bounce");
     SetTargetFPS(60);
 
-    createWaveBowl({0.0f,0.0f}, 1000.0f, 200.0f, 200, &obj);
-
     while (!WindowShouldClose())
     {
-        // Calculate update
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-            vec2 mousePos = reverseFormatWindowVec2(&global_context, static_cast<float>(GetMouseX()), static_cast<float>(GetMouseY()));
-            ball.p = mousePos;
-            ball.v = {0.0f,0.0f};
-        }               
-
-        switch(global_context.cameraFollowType) {
-            case FollowType::ball:
-                global_context.cameraPos = ball.p;
-                break;
-            case FollowType::ball_delayed:
-                global_context.cameraPos = global_context.cameraPos + (ball.p - global_context.cameraPos)/10.0f;
-                break;
-            default:
-            global_context.cameraPos = {0.0f,0.0f};
-        }
-
-        if (IsKeyPressed(32)) {
-            update = false;
-        }
-        if (update) {
-            ball.update(&obj);
-        }
-
-        // End update
-
-        BeginDrawing();
-        ClearBackground(BLACK);
-
-        // Start image generation
-
-        obj.draw(&global_context);
-        ball.draw(&global_context);
-        screenText();
-
-        EndDrawing();
+        update(&context);
+        draw(&context);
     }
     CloseWindow();
     return 0;

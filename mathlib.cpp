@@ -33,21 +33,36 @@ bool getLowestRoot(float a, float b, float c, float maxR,float* root) {
     return false;
 }
 
-edge::edge(vec2 v1_, vec2 v2_) : v1(v1_), v2(v2_) {
+Edge::Edge(vec2 v1_, vec2 v2_) : v1(v1_), v2(v2_) {
     n = (v2_ - v1_).normal();
     n.normalise();
     d = n.dot(v1_);
 }
 
-bool edge::isFrontFacingTo(const vec2& v) const {
+Edge::Edge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_) : v1(v1_), v2(v2_), d1(d1_), d2(d2_) {
+    n = (v2_ - v1_).normal();
+    n.normalise();
+    d = n.dot(v1_);
+}
+
+bool Edge::isFrontFacingTo(const vec2& v) const {
     return n.dot(v) > 0.0;
 }
 
-float signedDistanceTo(vec2 &p, edge e) {
+void Edge::update() {
+    v1+=d1;
+    v2+=d2;
+
+    n = (v2 - v1).normal();
+    n.normalise();
+    d = n.dot(v1);
+}
+
+float signedDistanceTo(vec2 &p, Edge e) {
     return (e.n.dot(p) - e.d);
 }
 
-bool checkPointInEdge(vec2 p, edge e) {
+bool checkPointInEdge(vec2 p, Edge e) {
     const float EPS = 1e-5;
 
     vec2 ab = e.v2 - e.v1;
@@ -59,7 +74,101 @@ bool checkPointInEdge(vec2 p, edge e) {
     return true;
 }
 
-void checkEdge(CollisionPacket* colPackage, const edge& e, edge* edgePtr) {
+void checkEdge(CollisionPacket* colPackage, const Edge& e, Edge* edgePtr) {
+    if (e.isFrontFacingTo(colPackage->velocity)) {
+        float t0, t1;
+        bool embeddedInEdge = false;
+
+        float signedDistToEdge = signedDistanceTo(colPackage->basePoint, e);
+        float normalDotVelocity = e.n.dot(colPackage->velocity);
+
+        if (fabs(normalDotVelocity) < 1e-7) {
+            if (fabs(signedDistToEdge) >= 1.0) {
+                return;
+            } else {
+                embeddedInEdge = true;
+                t0 = 0.0;
+                t1 = 1.0;
+            }
+        } else {
+            t0=(-1.0-signedDistToEdge)/normalDotVelocity;
+            t1=( 1.0-signedDistToEdge)/normalDotVelocity;
+
+            if (t0 > t1) {
+                float temp = t1;
+                t1 = t0;
+                t0 = temp;
+            }
+
+            if (t0 > 1.0 || t1 < 0.0) {
+                return;
+            }
+
+            if (t0 < 0.0) t0 = 0.0;
+            if (t1 < 0.0) t1 = 0.0;
+            if (t0 > 1.0) t0 = 1.0;
+            if (t1 > 1.0) t1 = 1.0;
+        }
+
+        vec2 collisionPoint;
+        vec2 collisionNormal;
+        bool foundCollision = false;
+        float t = 1.0;
+
+        if (!embeddedInEdge) {
+            vec2 edgeIntersectionPoint = (colPackage->basePoint - e.n) + colPackage->velocity * t0;
+
+            if (checkPointInEdge(edgeIntersectionPoint, e)) {
+                foundCollision = true;
+                t = t0;
+                collisionPoint = edgeIntersectionPoint;
+                collisionNormal = e.n;
+            }
+        }
+
+        if (foundCollision == false) {
+            vec2 base = colPackage->basePoint;
+            vec2 velocity = colPackage ->velocity;
+            float a,b,c;
+            float newT;
+
+            a = velocity.squaredLength();
+            b = 2.0*(velocity.dot(base-e.v1));
+            c = (e.v1-base).squaredLength() - 1.0;
+
+            if (getLowestRoot(a,b,c, t, &newT)) {
+                t = newT;
+                foundCollision = true;
+                collisionPoint = e.v1;
+                collisionNormal = (base + velocity * t - e.v1);
+                collisionNormal.normalise();
+            }
+
+            b = 2.0*(velocity.dot(base-e.v2));
+            c = (e.v2-base).squaredLength() - 1.0;
+
+            if (getLowestRoot(a,b,c, t, &newT)) {
+                t = newT;
+                foundCollision = true;
+                collisionPoint = e.v2;
+                collisionNormal = (base + velocity * t - e.v2);
+                collisionNormal.normalise();
+            }
+        }
+
+        if (foundCollision == true) {
+            if (colPackage->foundCollision == false || t < colPackage->nearestDistance) {
+                colPackage->nearestDistance = t;
+                colPackage->intersectionPoint = collisionPoint;
+                colPackage->foundCollision = true;
+                colPackage->collisionNormal = collisionNormal;
+                colPackage->nearestEdge = edgePtr;
+            }
+        }
+    }
+}
+
+void checkMovingEdge(CollisionPacket* colPackage, const Edge& e, Edge* edgePtr) {
     if (e.isFrontFacingTo(colPackage->velocity)) {
         float t0, t1;
         bool embeddedInEdge = false;
