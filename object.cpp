@@ -11,9 +11,10 @@ void Object::update() {
             //Test
             edge->update();
         }
-    }
 
-    rotateAround(this, centre, M_PI / 100.0f);
+        rotationSpeed = e.front()->v1.len() / 10000.0f;
+        rotateAround(this, centre, rotationSpeed);
+    }
 }
 
 void Object::collisionResponse(CollisionResponseData* data) {}

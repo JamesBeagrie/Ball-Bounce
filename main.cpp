@@ -9,7 +9,7 @@
 #include "windowlib.h"
 
 bool setup(Context* context) {
-    Ball ball({0.0f,0.0f}, {0.0f,0.0f}, {10.0f,10.0f});
+    Ball ball({0.0f,0.0f}, {-10.0f,5.521f}, {10.0f,10.0f});
 
     //Object obj;
     //obj.centre = {100.0f , 100.0f};

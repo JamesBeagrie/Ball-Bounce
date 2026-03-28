@@ -14,6 +14,7 @@ class Object {
     std::vector<std::unique_ptr<Edge>> e;
     vec2 centre;
     bool isDead;
+    float rotationSpeed;
 
     void draw(Context* context);
 

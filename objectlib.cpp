@@ -19,6 +19,15 @@ void rotateAround(Object* obj, vec2 c, float rotation) { // Anticlockwise rotati
 
         edge->v1 = edge->v1 + c;
         edge->v2 = edge->v2 + c;
+
+        edge->d1 = edge->d1 - c;
+        edge->d2 = edge->d2 - c;
+
+        edge->d1 = {rotationCos * edge->d1.x - rotationSin * edge->d1.y, rotationSin * edge->d1.x + rotationCos * edge->d1.y};
+        edge->d2 = {rotationCos * edge->d2.x - rotationSin * edge->d2.y, rotationSin * edge->d2.x + rotationCos * edge->d2.y};
+
+        edge->d1 = edge->d1 + c;
+        edge->d2 = edge->d2 + c;
     }
 }
 
@@ -66,8 +75,11 @@ void createCircle(Object* obj, vec2 c, float ballRadius, float r, int segments, 
         vec2 p2 = {c.x + r * sinf(2.0f * M_PI * (i+1.0f) / segments), 
             c.y + r * cosf(2.0f * M_PI * (i+1.0f) / segments)};
 
-        vec2 d1 = -((p1 - c) / 100.0f) * 0.0f;
-        vec2 d2 = -((p2 - c) / 100.0f) * 0.0f;
+        vec2 d1 = -(p1 - c) * 2.0f;
+        vec2 d2 = -(p2 - c) * 2.0f;
+
+        d1.normalise();
+        d2.normalise();
 
         if (i < segments - holeSegments) {
             obj->e.push_back(std::make_unique<Edge>(p1,p2,d1,d2, SKYBLUE));
@@ -81,8 +93,8 @@ void createCircle(Object* obj, vec2 c, float ballRadius, float r, int segments, 
 void createCircleHell(std::vector<Object>* environment, vec2 c, float ballRadius, float startingRadius, float gap, int segments, int holeSegments, int circleCount) {
     for (int i = 0; i < circleCount; i++) {
         Object obj;
+        obj.rotationSpeed = 3.0f * (i+1.0f) / 500.0f;
         createCircle(&obj, c, 0.0f, startingRadius + (i * gap), segments, holeSegments);
-        rotateAround(&obj, c, M_PI * i / 5.0f);
         environment->push_back(std::move(obj));
     }
 }
