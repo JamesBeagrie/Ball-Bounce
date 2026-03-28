@@ -13,8 +13,11 @@ class Object {
     public:
     std::vector<std::unique_ptr<Edge>> e;
     vec2 centre;
+    bool isDead;
 
     void draw(Context* context);
+
+    void collisionResponse(CollisionResponseData* data);
 
     void checkCollision(CollisionPacket* collisionPackage);
     void update();

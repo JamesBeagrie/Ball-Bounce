@@ -5,6 +5,16 @@
 #include "raylib.h"
 #include <vector>
 #include <memory>
+#include "mathlib.h"
+
+class CollisionResponseData {
+    public:
+    bool deleteOwnObj;
+
+    CollisionResponseData();
+};
+
+class Object;
 
 bool getLowestRoot(float a, float b, float c, float maxR,float* root);
 
@@ -70,15 +80,19 @@ class Edge {
     Edge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_, Color color_);
     void update();
     bool isFrontFacingTo(const vec2& v) const;
+    virtual void collisionResponse(CollisionResponseData* data);
 };
 
 class DetectorEdge : public Edge {
     public:
     bool invis;
+    bool deleteSelf;
     DetectorEdge();
-    DetectorEdge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_, Color color_, bool invis_);
+    DetectorEdge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_, Color color_, bool invis_, bool deleteSelf_);
     DetectorEdge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_, Color color_);
     DetectorEdge(vec2 v1_, vec2 v2_, Color color_);
+
+    void collisionResponse(CollisionResponseData* data) override;
 };
 
 class CollisionPacket {
@@ -97,14 +111,13 @@ class CollisionPacket {
     vec2 intersectionPoint;
     vec2 collisionNormal;
     Edge* nearestEdge;
+    Object* nearestObj;
 };
 
 float signedDistanceTo(vec2 &p, Edge e);
 
 bool checkPointInEdge(vec2 p, Edge e);
 
-void checkEdge(CollisionPacket* colPackage, const Edge& e, Edge* edgePtr);
-
-void checkMovingEdge(CollisionPacket* colPackage, const Edge& e, Edge* edgePtr);
+void checkEdge(CollisionPacket* colPackage, const Edge& e, Edge* edgePtr, Object* objPtr);
 
 #endif

@@ -11,10 +11,10 @@ class Ball {
     public:
     vec2 p;
     vec2 v;
-    vec2 g = {0.0f, -1.0f};
+    vec2 g = {0.0f, 0.0f};
     vec2 r;
     float m = 1.0f;
-    float e = 0.0f;
+    float e = 1.0f;
     static constexpr float unitsPerMeter = 100.0f;
     int collisionRecursionDepth;
     
@@ -26,7 +26,6 @@ class Ball {
 
     private:
     vec2 collideWithWorld(std::vector<Object>& environment, CollisionPacket* collisionPackage, const vec2& pos, const vec2& vel, vec2* finalVelocity, int collisionRecursionDepth);
-    void checkEdge(CollisionPacket* colPackage, const Edge &e);
     void updateCollisions(std::vector<Object>& environment, CollisionPacket* collisionPackage, const vec2& pos, const vec2& vel, const vec2& radius);
     void updateCollisionData(CollisionPacket* collisionPackage, const vec2& pos, const vec2& vel);
     float calculateEnergy();

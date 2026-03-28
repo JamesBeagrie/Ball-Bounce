@@ -5,23 +5,31 @@
 #include "object.h"
 
 void Object::update() {
-    for(auto& edge : e) {
-        //Test
-        edge->update();
+    if(!isDead) {
+        for(auto& edge : e) {
+            //Test
+            edge->update();
+        }
     }
 }
 
+void Object::collisionResponse(CollisionResponseData* data) {}
+
 void Object::draw(Context* context) {
-    for(auto& edge : e) {
-        vec2 v1_ = formatWindowVec2(context, edge->v1 + centre);
-        vec2 v2_ = formatWindowVec2(context, edge->v2 + centre);
-        DrawLine(static_cast<int>(v1_.x), static_cast<int>(v1_.y), static_cast<int>(v2_.x), static_cast<int>(v2_.y), edge->color);
+    if(!isDead) {
+        for(auto& edge : e) {
+            vec2 v1_ = formatWindowVec2(context, edge->v1 + centre);
+            vec2 v2_ = formatWindowVec2(context, edge->v2 + centre);
+            DrawLine(static_cast<int>(v1_.x), static_cast<int>(v1_.y), static_cast<int>(v2_.x), static_cast<int>(v2_.y), edge->color);
+        }
     }
 }
 
 void Object::checkCollision(CollisionPacket* collisionPackage) {
-    for(auto& edge : e) {
-        Edge eSpaceEdge = Edge((edge->v1 + centre) / collisionPackage->eRadius,(edge->v2 + centre) /collisionPackage->eRadius);
-        checkEdge(collisionPackage, eSpaceEdge, edge.get());
+    if(!isDead) {
+        for(auto& edge : e) {
+            Edge eSpaceEdge = Edge((edge->v1 + centre) / collisionPackage->eRadius,(edge->v2 + centre) /collisionPackage->eRadius);
+            checkEdge(collisionPackage, eSpaceEdge, edge.get(), this);
+        }
     }
 }

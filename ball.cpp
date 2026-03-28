@@ -42,6 +42,18 @@ vec2 Ball::collideWithWorld(std::vector<Object>& environment, CollisionPacket* c
         return pos + vel;
     }
 
+    // start of edge check
+    CollisionResponseData collisionResponseData;
+    collisionPackage->nearestEdge->collisionResponse(&collisionResponseData);
+
+    if (collisionResponseData.deleteOwnObj) {
+        std::cout << "Hit Detector Edge" << std::endl;
+        collisionPackage->nearestObj->isDead = true;
+        collisionRecursionDepth++;
+        return collideWithWorld(environment, collisionPackage, pos, vel, finalVelocity, collisionRecursionDepth);
+    }
+    // end of edge check
+
     const float t = collisionPackage->nearestDistance;
 
     float moveT = t;
