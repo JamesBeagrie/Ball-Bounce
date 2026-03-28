@@ -24,7 +24,7 @@ ball has the ball that bounces along with calculating collisions between objects
 
 Compiling guide:
 
-g++ main.cpp mathlib.cpp ball.cpp object.cpp -o app -lraylib -lopengl32 -lgdi32 -lwinmm
+g++ main.cpp mathlib.cpp objectlib.cpp windowlib.cpp ball.cpp object.cpp -o app -lraylib -lopengl32 -lgdi32 -lwinmm
 
 aka, all the .cpp files after g++, in the raylib w64devkit
 

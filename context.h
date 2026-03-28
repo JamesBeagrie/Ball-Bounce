@@ -15,7 +15,7 @@ enum class FollowType {
 
 class GameContext {
     public:
-    std::vector<Object> environment;
+    std::vector<std::unique_ptr<Object>> environment;
     Ball ball;
 };
 

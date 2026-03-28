@@ -14,7 +14,7 @@ bool setup(Context* context) {
     //Object obj;
     //obj.centre = {100.0f , 100.0f};
     //createCircle(&obj, {0.0f,0.0f}, 10.0f, 200.0f, 50.0f, 50, 5);
-    createCircleHell(&context->gameContext.environment, {0.0f,0.0f}, 10.0f, 200.0f, 50.0f, 50, 5, 100);
+    createCircleHell(context->gameContext.environment, {0.0f,0.0f}, 10.0f, 200.0f, 50.0f, 50, 5, 100);
     context->gameContext.ball = ball;
 
     context->cameraFollowType = FollowType::ball_delayed;
@@ -41,7 +41,7 @@ void update(Context* context) {
     }
     
     for (auto& obj : context->gameContext.environment) {
-        obj.update();
+        obj->update();
     }
     context->gameContext.ball.update(context->gameContext.environment);
 }
@@ -50,7 +50,7 @@ void draw(Context* context) {
     BeginDrawing();
     ClearBackground(BLACK);
     for (auto& obj : context->gameContext.environment) {
-        obj.draw(context);
+        obj->draw(context);
     }
     context->gameContext.ball.draw(context);
     screenText();

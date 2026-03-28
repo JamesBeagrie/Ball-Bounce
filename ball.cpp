@@ -21,7 +21,7 @@ void Ball::draw(Context* context) {
     DrawCircle(static_cast<int>(drawPos.x), static_cast<int>(drawPos.y), static_cast<float>(r.x), SKYBLUE);
 }
 
-vec2 Ball::collideWithWorld(std::vector<Object>& environment, CollisionPacket* collisionPackage, const vec2& pos, const vec2& vel, vec2* finalVelocity, int collisionRecursionDepth) {
+vec2 Ball::collideWithWorld(std::vector<std::unique_ptr<Object>>& environment, CollisionPacket* collisionPackage, const vec2& pos, const vec2& vel, vec2* finalVelocity, int collisionRecursionDepth) {
     const float epsilon = 1e-7f;
     const float vLen = vel.len();
 
@@ -35,7 +35,7 @@ vec2 Ball::collideWithWorld(std::vector<Object>& environment, CollisionPacket* c
     collisionPackage->foundCollision = false;
 
     for (auto& obj : environment) {
-        obj.checkCollision(collisionPackage);
+        obj->checkCollision(collisionPackage);
     }
 
     if (collisionPackage->foundCollision == false)  {
@@ -77,7 +77,7 @@ vec2 Ball::collideWithWorld(std::vector<Object>& environment, CollisionPacket* c
     return collideWithWorld(environment, collisionPackage, newBasePoint, newVelocityVector, finalVelocity, collisionRecursionDepth);
 }
 
-void Ball::updateCollisions(std::vector<Object>& environment, CollisionPacket* collisionPackage, const vec2& pos, const vec2& vel, const vec2& radius) {
+void Ball::updateCollisions(std::vector<std::unique_ptr<Object>>& environment, CollisionPacket* collisionPackage, const vec2& pos, const vec2& vel, const vec2& radius) {
     collisionPackage->R2Position = pos;
     collisionPackage->R2Velocity = vel;
     collisionPackage->eRadius = radius;
@@ -96,7 +96,7 @@ void Ball::updateCollisionData(CollisionPacket* collisionPackage, const vec2& po
     v = vel * collisionPackage->eRadius;
 }
 
-void Ball::update(std::vector<Object>& environment) {
+void Ball::update(std::vector<std::unique_ptr<Object>>& environment) {
     v = v + g;
     CollisionPacket collisionPackage;
     updateCollisions(environment, &collisionPackage, p, v, r);

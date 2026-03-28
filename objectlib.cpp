@@ -90,11 +90,11 @@ void createCircle(Object* obj, vec2 c, float ballRadius, float r, int segments, 
 }
 
 
-void createCircleHell(std::vector<Object>* environment, vec2 c, float ballRadius, float startingRadius, float gap, int segments, int holeSegments, int circleCount) {
+void createCircleHell(std::vector<std::unique_ptr<Object>>& environment, vec2 c, float ballRadius, float startingRadius, float gap, int segments, int holeSegments, int circleCount) {
     for (int i = 0; i < circleCount; i++) {
-        Object obj;
-        obj.rotationSpeed = 3.0f * (i+1.0f) / 500.0f;
-        createCircle(&obj, c, 0.0f, startingRadius + (i * gap), segments, holeSegments);
-        environment->push_back(std::move(obj));
+        std::unique_ptr<Object> obj = std::make_unique<Object>();
+        obj->rotationSpeed = 3.0f * (i+1.0f) / 500.0f;
+        createCircle(obj.get(), c, 0.0f, startingRadius + (i * gap), segments, holeSegments);
+        environment.push_back(std::move(obj));
     }
 }
