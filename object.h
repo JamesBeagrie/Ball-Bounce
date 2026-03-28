@@ -21,7 +21,13 @@ class Object {
     void collisionResponse(CollisionResponseData* data);
 
     void checkCollision(CollisionPacket* collisionPackage);
-    void update();
+    virtual void update();
+};
+
+class Circle : public Object {
+    public:
+    float rotationSpeed;
+    void update() override;
 };
 
 #endif

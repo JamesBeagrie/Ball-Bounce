@@ -11,9 +11,6 @@ void Object::update() {
             //Test
             edge->update();
         }
-
-        rotationSpeed = e.front()->v1.len() / 10000.0f;
-        rotateAround(this, centre, rotationSpeed);
     }
 }
 
@@ -35,5 +32,17 @@ void Object::checkCollision(CollisionPacket* collisionPackage) {
             Edge eSpaceEdge = Edge((edge->v1 + centre) / collisionPackage->eRadius,(edge->v2 + centre) /collisionPackage->eRadius);
             checkEdge(collisionPackage, eSpaceEdge, edge.get(), this);
         }
+    }
+}
+
+void Circle::update() {
+    if(!isDead) {
+        for(auto& edge : e) {
+            //Test
+            edge->update();
+        }
+
+        rotationSpeed = e.front()->v1.len() / 10000.0f;
+        rotateAround(this, centre, rotationSpeed);
     }
 }
