@@ -11,7 +11,7 @@ class Ball {
     public:
     vec2 p;
     vec2 v;
-    vec2 g = {0.0f, 0.0f};
+    vec2 g = {0.0f, -1.0f};
     vec2 r;
     float m = 1.0f;
     float e = 1.0f;

@@ -1,7 +1,26 @@
 #include <math.h>
 #include "mathlib.h"
 #include "object.h"
+#include <utility>
 #include <memory>
+
+void rotateAround(Object* obj, vec2 c, float rotation) { // Anticlockwise rotation
+    float rotationCos = cos(rotation);
+    float rotationSin = sin(rotation);
+
+    for (auto& edge : obj->e) {
+        // Just does matrix multiplication without matrix class right now
+
+        edge->v1 = edge->v1 - c;
+        edge->v2 = edge->v2 - c;
+
+        edge->v1 = {rotationCos * edge->v1.x - rotationSin * edge->v1.y, rotationSin * edge->v1.x + rotationCos * edge->v1.y};
+        edge->v2 = {rotationCos * edge->v2.x - rotationSin * edge->v2.y, rotationSin * edge->v2.x + rotationCos * edge->v2.y};
+
+        edge->v1 = edge->v1 + c;
+        edge->v2 = edge->v2 + c;
+    }
+}
 
 //needs to be reworked for new versions
 void createPolygon(Object* obj, int sides, vec2 c, float radius) {
@@ -40,16 +59,12 @@ void createWaveBowl(Object* obj, vec2 c, float width, float height, int segments
     }
 }
 
-void createCircleHell(vec2 c, float startingRadius, float gap, float holeAngle, int segments, int holeSegments, int circleCount, std::vector<Object> environment) {
-
-}
-
-void createCircle(Object* obj, vec2 c, float ballRadius, float startingRadius, float gap, int segments, int holeSegments) {
+void createCircle(Object* obj, vec2 c, float ballRadius, float r, int segments, int holeSegments) {
     for (int i = 0; i < segments; i++) {
-        vec2 p1 = {c.x + (startingRadius + gap) * static_cast<float>(sin(static_cast<double>(2.0f * M_PI * i / segments))), 
-            c.y + (startingRadius + gap) * static_cast<float>(cos(static_cast<double>(2.0f * M_PI * i / segments)))};
-        vec2 p2 = {c.x + (startingRadius + gap) * static_cast<float>(sin(static_cast<double>(2.0f * M_PI * (i+1.0f) / segments))), 
-            c.y + (startingRadius + gap) * static_cast<float>(cos(static_cast<double>(2.0f * M_PI * (i+1.0f) / segments)))};
+        vec2 p1 = {c.x + r * sinf(2.0f * M_PI * i / segments), 
+            c.y + r * cosf(2.0f * M_PI * i / segments)};
+        vec2 p2 = {c.x + r * sinf(2.0f * M_PI * (i+1.0f) / segments), 
+            c.y + r * cosf(2.0f * M_PI * (i+1.0f) / segments)};
 
         vec2 d1 = -((p1 - c) / 100.0f) * 0.0f;
         vec2 d2 = -((p2 - c) / 100.0f) * 0.0f;
@@ -59,5 +74,15 @@ void createCircle(Object* obj, vec2 c, float ballRadius, float startingRadius, f
         } else {
             obj->e.push_back(std::make_unique<DetectorEdge>(p1,p2,d1,d2, RED, true, true));
         }
+    }
+}
+
+
+void createCircleHell(std::vector<Object>* environment, vec2 c, float ballRadius, float startingRadius, float gap, int segments, int holeSegments, int circleCount) {
+    for (int i = 0; i < circleCount; i++) {
+        Object obj;
+        createCircle(&obj, c, 0.0f, startingRadius + (i * gap), segments, holeSegments);
+        rotateAround(&obj, c, M_PI * i / 5.0f);
+        environment->push_back(std::move(obj));
     }
 }

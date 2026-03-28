@@ -3,6 +3,7 @@
 #include "mathlib.h"
 #include "windowlib.h"
 #include "object.h"
+#include "objectlib.h"
 
 void Object::update() {
     if(!isDead) {
@@ -11,6 +12,8 @@ void Object::update() {
             edge->update();
         }
     }
+
+    rotateAround(this, centre, M_PI / 100.0f);
 }
 
 void Object::collisionResponse(CollisionResponseData* data) {}
