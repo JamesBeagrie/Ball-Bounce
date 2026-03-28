@@ -1,6 +1,9 @@
 #include "mathlib.h"
+#include "raylib.h"
 #include <math.h>
 #include <iostream>
+#include <vector>
+#include <memory>
 
 bool getLowestRoot(float a, float b, float c, float maxR,float* root) {
     // Check if a solution exists
@@ -33,17 +36,43 @@ bool getLowestRoot(float a, float b, float c, float maxR,float* root) {
     return false;
 }
 
-Edge::Edge(vec2 v1_, vec2 v2_) : v1(v1_), v2(v2_) {
+Edge::Edge() : v1({0.0f,0.0f}), v2({0.0f,0.0f}), d1({0.0f,0.0f}), d2({0.0f,0.0f}), color(SKYBLUE) {
+    n = (v2 - v1).normal();
+    n.normalise();
+    d = n.dot(v1);
+}
+
+Edge::Edge(vec2 v1_, vec2 v2_) : v1(v1_), v2(v2_), d1({0.0f,0.0f}), d2({0.0f,0.0f}), color(SKYBLUE) {
     n = (v2_ - v1_).normal();
     n.normalise();
     d = n.dot(v1_);
 }
 
-Edge::Edge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_) : v1(v1_), v2(v2_), d1(d1_), d2(d2_) {
+Edge::Edge(vec2 v1_, vec2 v2_, Color color_) : v1(v1_), v2(v2_), d1({0.0f,0.0f}), d2({0.0f,0.0f}), color(color_) {
     n = (v2_ - v1_).normal();
     n.normalise();
     d = n.dot(v1_);
 }
+
+Edge::Edge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_) : v1(v1_), v2(v2_), d1(d1_), d2(d2_), color(SKYBLUE) {
+    n = (v2_ - v1_).normal();
+    n.normalise();
+    d = n.dot(v1_);
+}
+
+Edge::Edge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_, Color color_) : v1(v1_), v2(v2_), d1(d1_), d2(d2_), color(color_) {
+    n = (v2_ - v1_).normal();
+    n.normalise();
+    d = n.dot(v1_);
+}
+
+DetectorEdge::DetectorEdge() : Edge(), invis(false) {}
+
+DetectorEdge::DetectorEdge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_, Color color_, bool invis_) : Edge(v1_, v2_, d1_, d2_, color_), invis(invis_) {}
+
+DetectorEdge::DetectorEdge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_, Color color_) : Edge(v1_, v2_, d1_, d2_, color_), invis(false) {}
+
+DetectorEdge::DetectorEdge(vec2 v1_, vec2 v2_, Color color_) : Edge(v1_, v2_, color_), invis(false) {}
 
 bool Edge::isFrontFacingTo(const vec2& v) const {
     return n.dot(v) > 0.0;

@@ -1,8 +1,8 @@
 Hi! Who ever sees this...
 
-This is my attempt at making the ball bouncing in circle that is seen in a lot of instagram videos.
+This is my attempt at making the ball bouncing in circle that is seen in a lot of instagram videos. And more! If I'm feeling really motivated.
 
-Uses swept collision edge-sphere logic
+Uses swept collision edge-sphere logic.
 
 I decided to do it a bit differently where it uses swept collision detection based on the algorithm found here: https://www.peroxide.dk/papers/collision/collision.pdf
 
@@ -32,7 +32,7 @@ aka, all the .cpp files after g++, in the raylib w64devkit
 
 Formatting:
 
-I will try to use this throughout but I cannot promise anything!
+I will try to use this throughout but I won't promise anything!
 
 Apart from variables which I will use CamelCase.
 

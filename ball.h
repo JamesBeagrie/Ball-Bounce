@@ -21,13 +21,13 @@ class Ball {
     Ball(vec2 p_, vec2 v_, vec2 r_);
     Ball();
 
-    void update(std::vector<Object> environment);
+    void update(std::vector<Object>& environment);
     void draw(Context* context);
 
     private:
-    vec2 collideWithWorld(std::vector<Object> environment, CollisionPacket* collisionPackage, const vec2& pos, const vec2& vel, vec2* finalVelocity, int collisionRecursionDepth);
+    vec2 collideWithWorld(std::vector<Object>& environment, CollisionPacket* collisionPackage, const vec2& pos, const vec2& vel, vec2* finalVelocity, int collisionRecursionDepth);
     void checkEdge(CollisionPacket* colPackage, const Edge &e);
-    void updateCollisions(std::vector<Object> environment, CollisionPacket* collisionPackage, const vec2& pos, const vec2& vel, const vec2& radius);
+    void updateCollisions(std::vector<Object>& environment, CollisionPacket* collisionPackage, const vec2& pos, const vec2& vel, const vec2& radius);
     void updateCollisionData(CollisionPacket* collisionPackage, const vec2& pos, const vec2& vel);
     float calculateEnergy();
 };

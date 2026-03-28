@@ -2,6 +2,9 @@
 #define MATHLIB_H
 
 #include <math.h>
+#include "raylib.h"
+#include <vector>
+#include <memory>
 
 bool getLowestRoot(float a, float b, float c, float maxR,float* root);
 
@@ -53,14 +56,29 @@ class Edge {
     vec2 v2;
     vec2 d1;
     vec2 d2;
+
+    Color color;
+
     vec2 n;
     float d;
     //float mu;
 
+    Edge();
     Edge(vec2 v1_, vec2 v2_);
+    Edge(vec2 v1_, vec2 v2_, Color color_);
     Edge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_);
+    Edge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_, Color color_);
     void update();
     bool isFrontFacingTo(const vec2& v) const;
+};
+
+class DetectorEdge : public Edge {
+    public:
+    bool invis;
+    DetectorEdge();
+    DetectorEdge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_, Color color_, bool invis_);
+    DetectorEdge(vec2 v1_, vec2 v2_, vec2 d1_, vec2 d2_, Color color_);
+    DetectorEdge(vec2 v1_, vec2 v2_, Color color_);
 };
 
 class CollisionPacket {

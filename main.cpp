@@ -15,7 +15,7 @@ bool setup(Context* context) {
 
     Ball ball({0.0f,0.0f}, {0.0f,0.0f}, {10.0f,10.0f});
 
-    context->gameContext.environment.push_back(obj);
+    context->gameContext.environment.push_back(std::move(obj));
     context->gameContext.ball = ball;
 
     context->cameraFollowType = FollowType::ball_delayed;
