@@ -208,6 +208,64 @@ void checkEdge(CollisionPacket* colPackage, const Edge& e, Edge* edgePtr, Object
     }
 }
 
+
+//
+// To be done...? 
+//
+
+void checkMovingEdge(CollisionPacket* colPackage, const Edge& e, Edge* edgePtr, Object* objPtr) {
+        float t0, t1;
+
+        vec2 collisionPoint;
+        vec2 collisionNormal;
+        bool foundCollision = false;
+        float t = 1.0;
+
+        // Check collision with infinite edge
+
+
+        if (foundCollision == false) {
+            vec2 base = colPackage->basePoint;
+            vec2 velocity = colPackage ->velocity;
+            float a,b,c;
+            float newT;
+
+            a = velocity.squaredLength();
+            b = 2.0*(velocity.dot(base-e.v1));
+            c = (e.v1-base).squaredLength() - 1.0;
+
+            if (getLowestRoot(a,b,c, t, &newT)) {
+                t = newT;
+                foundCollision = true;
+                collisionPoint = e.v1;
+                collisionNormal = (base + velocity * t - e.v1);
+                collisionNormal.normalise();
+            }
+
+            b = 2.0*(velocity.dot(base-e.v2));
+            c = (e.v2-base).squaredLength() - 1.0;
+
+            if (getLowestRoot(a,b,c, t, &newT)) {
+                t = newT;
+                foundCollision = true;
+                collisionPoint = e.v2;
+                collisionNormal = (base + velocity * t - e.v2);
+                collisionNormal.normalise();
+            }
+        }
+
+        if (foundCollision == true) {
+            if (colPackage->foundCollision == false || t < colPackage->nearestDistance) {
+                colPackage->nearestDistance = t;
+                colPackage->intersectionPoint = collisionPoint;
+                colPackage->foundCollision = true;
+                colPackage->collisionNormal = collisionNormal;
+                colPackage->nearestEdge = edgePtr;
+                colPackage->nearestObj = objPtr;
+            }
+        }
+}
+
 vec2::vec2(float x_, float y_) : x(x_), y(y_) {}
 
 vec2::vec2() : x(0.0), y(0.0) {}

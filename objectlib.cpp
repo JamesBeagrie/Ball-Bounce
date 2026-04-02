@@ -94,6 +94,7 @@ void createCircleHell(std::vector<std::unique_ptr<Object>>& environment, vec2 c,
     for (int i = 0; i < circleCount; i++) {
         std::unique_ptr<Circle> obj = std::make_unique<Circle>();
         obj->rotationSpeed = 3.0f * (i+1.0f) / 500.0f;
+        obj->isMoving = false;
         createCircle(obj.get(), c, 0.0f, startingRadius + (i * gap), segments, holeSegments);
         environment.push_back(std::move(obj));
     }

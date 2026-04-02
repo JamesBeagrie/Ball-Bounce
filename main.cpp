@@ -10,10 +10,6 @@
 
 bool setup(Context* context) {
     Ball ball({0.0f,0.0f}, {-10.0f,5.521f}, {10.0f,10.0f});
-
-    //Object obj;
-    //obj.centre = {100.0f , 100.0f};
-    //createCircle(&obj, {0.0f,0.0f}, 10.0f, 200.0f, 50.0f, 50, 5);
     createCircleHell(context->gameContext.environment, {0.0f,0.0f}, 10.0f, 200.0f, 50.0f, 50, 5, 100);
     context->gameContext.ball = ball;
 
@@ -56,6 +52,12 @@ void draw(Context* context) {
     screenText();
     EndDrawing();
 }
+
+//
+// Program entry point
+//
+// Sets up the game environment and player then runs in a loop of updating and drawing
+//
 
 int main(void)
 {
